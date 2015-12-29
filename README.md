@@ -1,0 +1,61 @@
+# Magento cache regeneration lock
+Avoid DOS when Magento regenerates its cache
+
+## The problem
+Let's say you reset Magento's cache, on the next run the cache gets recreated but... what if you're website has a lot of traffic and, before the cache regeneration finishes, you got more requests?
+
+What happens is that all the concurrent requests will trigger cache regeneration, sometimes these requests will create a spike in the server(s) load making your website unavailable.
+
+## Why is it happening?
+
+Magento, by default, doesn't use a locking mechanism to prevent multiple concurrent cache regenerations. You could check it in the Mage_Core_Model_App class.
+
+## Solution
+
+Overriding Mage_Core_Model_App class in your "local" codepool implementing the locking mechanism.
+
+## Why can't we use a standard Magento model rewrite?
+
+Cause Mage_Core_Model_App is a special class that's not instanced (by the Magento core) using the Mage::getModel(), it's instead instanced with a "new Mage_Core_Model_App()" in app/Mage.php.
+
+This is why I couldn't create a Magento module for this purpose.
+
+## Installation
+
+If you're on Linux or Mac OSX use these lines of code:
+```
+cd magento-root-directory
+mkdir -p app/code/local/Mage/Core/Model
+cp app/code/core/Mage/Core/Model/App.php app/code/local/Mage/Core/Model/App.php
+wget https://raw.githubusercontent.com/fballiano/magento-cache-regeneration-lock/master/fballiano-magento-cache-regeneration-lock.patch
+patch -p1 < fballiano-magento-cache-regeneration-lock.patch
+rm fballiano-magento-cache-regeneration-lock.patch
+```
+If you're on Windows simply copy core/Mage/Core/Model/App.php to the local pool and apply the patch in this repository.
+
+## Why a patch and now directly the patched file?
+
+To have a better compatibility across multiple Magento (1.x) versions.
+
+##Support
+If you have any issues with this extension, open an issue on GitHub (see URL above).
+
+##Contribution
+Any contributions are highly appreciated. The best way to contribute code is to open a
+[pull request on GitHub](https://help.github.com/articles/using-pull-requests).
+
+##Developer
+Fabrizio Balliano
+[http://fabrizioballiano.it](http://fabrizioballiano.com)  
+[@fballiano](https://twitter.com/fballiano)
+
+##Licence
+[OSL - Open Software Licence 3.0](http://opensource.org/licenses/osl-3.0.php)
+
+##Copyright
+(c) 2015-2016 Fabrizio Balliano
+
+## Credits
+
+This code was inspired by Made_Cache by Made:
+https://github.com/madepeople/Made_Cache
