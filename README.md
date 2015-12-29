@@ -53,7 +53,7 @@ Fabrizio Balliano
 [OSL - Open Software Licence 3.0](http://opensource.org/licenses/osl-3.0.php)
 
 ##Copyright
-(c) 2015-2016 Fabrizio Balliano
+(c) Fabrizio Balliano
 
 ## Credits
 
