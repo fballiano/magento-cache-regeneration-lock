@@ -1,0 +1,83 @@
+From f58e267efa1d2dc162b20fb71f7bf6c5c2a04bb3 Mon Sep 17 00:00:00 2001
+From: Fabrizio Balliano <fabrizio@fabrizioballiano.com>
+Date: Tue, 29 Dec 2015 16:23:58 +0000
+Subject: [PATCH] fballiano-magento-cache-regeneration-lock
+
+---
+ app/code/local/Mage/Core/Model/App.php | 49 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 49 insertions(+)
+
+diff --git a/app/code/local/Mage/Core/Model/App.php b/app/code/local/Mage/Core/Model/App.php
+index 02212c2..0b66ea3 100644
+--- a/app/code/local/Mage/Core/Model/App.php
++++ b/app/code/local/Mage/Core/Model/App.php
+@@ -422,6 +422,15 @@ class Mage_Core_Model_App
+     protected function _initModules()
+     {
+         if (!$this->_config->loadModulesCache()) {
++            //FBALLIANO CACHE GENERATION LOCK START
++            if ($this->fballianoIsLocked()) {
++                while ($this->fballianoIsLocked()) sleep(3);
++                $this->_config->loadModulesCache();
++                return $this;
++            }
++            $this->fballianoLock();
++            //FBALLIANO CACHE GENERATION LOCK END
++
+             $this->_config->loadModules();
+             if ($this->_config->isLocalConfigLoaded() && !$this->_shouldSkipProcessModulesUpdates()) {
+                 Varien_Profiler::start('mage::app::init::apply_db_schema_updates');
+@@ -430,10 +439,50 @@ class Mage_Core_Model_App
+             }
+             $this->_config->loadDb();
+             $this->_config->saveCache();
++
++            //FBALLIANO CACHE GENERATION LOCK START
++            $this->fballianoUnlock();
++            //FBALLIANO CACHE GENERATION LOCK END
+         }
+         return $this;
+     }
+ 
++    //FBALLIANO CACHE GENERATION LOCK START
++    protected function _fballianoGetLockFile()
++    {
++        if (!isset($GLOBALS["fballiano_lock_file_pointer"]) or !is_resource($GLOBALS["fballiano_lock_file_pointer"])) {
++            $lockName = "fballiano_cache_regeneration";
++            $varDir = Mage::getConfig()->getVarDir('locks');
++            $file = $varDir . DS . $lockName . '.lock';
++            $GLOBALS["fballiano_lock_file_pointer"] = fopen($file, "w+");
++        }
++
++        return $GLOBALS["fballiano_lock_file_pointer"];
++    }
++
++    public function fballianoLock()
++    {
++        $fp = $this->_fballianoGetLockFile();
++        return flock($fp, LOCK_EX);
++    }
++
++    public function fballianoUnlock()
++    {
++        $fp = $this->_fballianoGetLockFile();
++        return flock($fp, LOCK_UN);
++    }
++
++    public function fballianoIsLocked()
++    {
++        $fp = $this->_fballianoGetLockFile();
++        if (flock($fp, LOCK_EX | LOCK_NB)) {
++            $this->fballianoUnlock();
++            return false;
++        }
++        return true;
++    }
++    //FBALLIANO CACHE GENERATION LOCK END
++
+     /**
+      * Check whether modules updates processing should be skipped
+      *
+-- 
+2.6.1
+
