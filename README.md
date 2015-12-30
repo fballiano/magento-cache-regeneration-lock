@@ -20,6 +20,10 @@ Cause Mage_Core_Model_App is a special class that's not instanced (by the Magent
 
 This is why I couldn't create a Magento module for this purpose.
 
+## Side benefit
+
+This solution should also avoid multiple concurrent runs of the resource setup scripts.
+
 ## Installation
 
 If you're on Linux or Mac OSX use these lines of code:
