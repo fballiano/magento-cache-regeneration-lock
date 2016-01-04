@@ -54,8 +54,8 @@ Any contributions are highly appreciated. The best way to contribute code is to 
 [pull request on GitHub](https://help.github.com/articles/using-pull-requests).
 
 ##Developer
-Fabrizio Balliano
-[http://fabrizioballiano.com](http://fabrizioballiano.com)
+Fabrizio Balliano  
+[http://fabrizioballiano.com](http://fabrizioballiano.com)  
 [@fballiano](https://twitter.com/fballiano)
 
 ##Licence
