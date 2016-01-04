@@ -37,7 +37,7 @@ rm fballiano-magento-cache-regeneration-lock.patch app/code/local/Mage/Core/Mode
 ```
 If you're on Windows simply copy core/Mage/Core/Model/App.php to the local pool and apply the patch in this repository.
 
-## Why a patch and now directly the patched file?
+## Why a patch and not directly the patched file?
 
 To have a better compatibility across multiple Magento (1.x) versions, both CE and EE.
 
