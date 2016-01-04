@@ -47,7 +47,7 @@ Tested on Magento CE 1.9 and EE 1.13.
 The file based flock version can only work on singe server projects or on multiserver projects where the document_root (actually the var directory) is shared via NFS. This solution will not work on a truly separated multiserver environment. I'm working on a different approach for that situation.
 
 ##Support
-If you have any issues with this extension, open an issue on GitHub (see URL above).
+If you have any issues with this extension, open an issue on GitHub.
 
 ##Contribution
 Any contributions are highly appreciated. The best way to contribute code is to open a
@@ -55,7 +55,7 @@ Any contributions are highly appreciated. The best way to contribute code is to 
 
 ##Developer
 Fabrizio Balliano
-[http://fabrizioballiano.it](http://fabrizioballiano.com)  
+[http://fabrizioballiano.com](http://fabrizioballiano.com)
 [@fballiano](https://twitter.com/fballiano)
 
 ##Licence
