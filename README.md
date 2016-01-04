@@ -41,6 +41,9 @@ If you're on Windows simply copy core/Mage/Core/Model/App.php to the local pool 
 
 To have a better compatibility across multiple Magento (1.x) versions.
 
+##Compatibility
+Tested on Magento CE 1.9 and EE 1.13
+
 ##Support
 If you have any issues with this extension, open an issue on GitHub (see URL above).
 
