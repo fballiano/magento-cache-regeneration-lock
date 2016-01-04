@@ -1,90 +1,51 @@
-From 00ff73e6d56b86d3a7904282a3455e88a7e2e402 Mon Sep 17 00:00:00 2001
+From 587ae57d31f743938c4a6e861d5a2b3add8055ea Mon Sep 17 00:00:00 2001
 From: Fabrizio Balliano <fabrizio@fabrizioballiano.com>
-Date: Mon, 4 Jan 2016 12:00:11 +0000
+Date: Mon, 4 Jan 2016 21:01:56 +0000
 Subject: [PATCH] fballiano-magento-cache-regeneration-lock
 
 ---
- app/code/local/Mage/Core/Model/App.php | 56 ++++++++++++++++++++++++++++++++++
- 1 file changed, 56 insertions(+)
+ app/code/local/Mage/Core/Model/App.php | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
 diff --git a/app/code/local/Mage/Core/Model/App.php b/app/code/local/Mage/Core/Model/App.php
-index 56f5765..84fab41 100644
+index 56f5765..b6ed5a9 100644
 --- a/app/code/local/Mage/Core/Model/App.php
 +++ b/app/code/local/Mage/Core/Model/App.php
-@@ -422,6 +422,22 @@ class Mage_Core_Model_App
+@@ -422,6 +422,23 @@ class Mage_Core_Model_App
      protected function _initModules()
      {
          if (!$this->_config->loadModulesCache()) {
 +            //FBALLIANO CACHE GENERATION LOCK START
-+            if ($this->fballianoIsLocked()) {
++            $lock = new Mage_Index_Model_Resource_Helper_Mysql4("index");
++            if ($lock->isLocked("fballiano_cache_regeneration")) {
 +                $loopcounter = 0;
-+                while ($this->fballianoIsLocked()) {
++                do {
 +                    if ($loopcounter++ > 20) {
 +                        header("504 Gateway Timeout", true, 504);
 +                        die();
 +                    }
 +                    sleep(3);
-+                }
++                } while ($lock->isLocked("fballiano_cache_regeneration"));
 +                $this->_config->loadModulesCache();
 +                return $this;
 +            }
-+            $this->fballianoLock();
++            $lock->setLock("fballiano_cache_regeneration");
 +            //FBALLIANO CACHE GENERATION LOCK END
 +
              $this->_config->loadModules();
              if ($this->_config->isLocalConfigLoaded() && !$this->_shouldSkipProcessModulesUpdates()) {
                  Varien_Profiler::start('mage::app::init::apply_db_schema_updates');
-@@ -430,10 +446,50 @@ class Mage_Core_Model_App
+@@ -430,6 +447,10 @@ class Mage_Core_Model_App
              }
              $this->_config->loadDb();
              $this->_config->saveCache();
 +
 +            //FBALLIANO CACHE GENERATION LOCK START
-+            $this->fballianoUnlock();
++            $lock->releaseLock("fballiano_cache_regeneration");
 +            //FBALLIANO CACHE GENERATION LOCK END
          }
          return $this;
      }
- 
-+    //FBALLIANO CACHE GENERATION LOCK START
-+    protected function _fballianoGetLockFile()
-+    {
-+        if (!isset($GLOBALS["fballiano_lock_file_pointer"]) or !is_resource($GLOBALS["fballiano_lock_file_pointer"])) {
-+            $lockName = "fballiano_cache_regeneration";
-+            $varDir = Mage::getConfig()->getVarDir('locks');
-+            $file = $varDir . DS . $lockName . '.lock';
-+            $GLOBALS["fballiano_lock_file_pointer"] = fopen($file, "w+");
-+        }
-+
-+        return $GLOBALS["fballiano_lock_file_pointer"];
-+    }
-+
-+    public function fballianoLock()
-+    {
-+        $fp = $this->_fballianoGetLockFile();
-+        return flock($fp, LOCK_EX);
-+    }
-+
-+    public function fballianoUnlock()
-+    {
-+        $fp = $this->_fballianoGetLockFile();
-+        return flock($fp, LOCK_UN);
-+    }
-+
-+    public function fballianoIsLocked()
-+    {
-+        $fp = $this->_fballianoGetLockFile();
-+        if (flock($fp, LOCK_EX | LOCK_NB)) {
-+            $this->fballianoUnlock();
-+            return false;
-+        }
-+        return true;
-+    }
-+    //FBALLIANO CACHE GENERATION LOCK END
-+
-     /**
-      * Check whether modules updates processing should be skipped
-      *
 -- 
 2.6.1
 
