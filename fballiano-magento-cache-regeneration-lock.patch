@@ -1,23 +1,30 @@
-From f58e267efa1d2dc162b20fb71f7bf6c5c2a04bb3 Mon Sep 17 00:00:00 2001
+From 00ff73e6d56b86d3a7904282a3455e88a7e2e402 Mon Sep 17 00:00:00 2001
 From: Fabrizio Balliano <fabrizio@fabrizioballiano.com>
-Date: Tue, 29 Dec 2015 16:23:58 +0000
+Date: Mon, 4 Jan 2016 12:00:11 +0000
 Subject: [PATCH] fballiano-magento-cache-regeneration-lock
 
 ---
- app/code/local/Mage/Core/Model/App.php | 49 ++++++++++++++++++++++++++++++++++
- 1 file changed, 49 insertions(+)
+ app/code/local/Mage/Core/Model/App.php | 56 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 56 insertions(+)
 
 diff --git a/app/code/local/Mage/Core/Model/App.php b/app/code/local/Mage/Core/Model/App.php
-index 02212c2..0b66ea3 100644
+index 56f5765..84fab41 100644
 --- a/app/code/local/Mage/Core/Model/App.php
 +++ b/app/code/local/Mage/Core/Model/App.php
-@@ -422,6 +422,15 @@ class Mage_Core_Model_App
+@@ -422,6 +422,22 @@ class Mage_Core_Model_App
      protected function _initModules()
      {
          if (!$this->_config->loadModulesCache()) {
 +            //FBALLIANO CACHE GENERATION LOCK START
 +            if ($this->fballianoIsLocked()) {
-+                while ($this->fballianoIsLocked()) sleep(3);
++                $loopcounter = 0;
++                while ($this->fballianoIsLocked()) {
++                    if ($loopcounter++ > 20) {
++                        header("504 Gateway Timeout", true, 504);
++                        die();
++                    }
++                    sleep(3);
++                }
 +                $this->_config->loadModulesCache();
 +                return $this;
 +            }
@@ -27,7 +34,7 @@ index 02212c2..0b66ea3 100644
              $this->_config->loadModules();
              if ($this->_config->isLocalConfigLoaded() && !$this->_shouldSkipProcessModulesUpdates()) {
                  Varien_Profiler::start('mage::app::init::apply_db_schema_updates');
-@@ -430,10 +439,50 @@ class Mage_Core_Model_App
+@@ -430,10 +446,50 @@ class Mage_Core_Model_App
              }
              $this->_config->loadDb();
              $this->_config->saveCache();
