@@ -72,7 +72,7 @@ Fabrizio Balliano
 ##Copyright
 (c) Fabrizio Balliano
 
-## Credits
+## Similar solutions
 
-This code was inspired by Made_Cache by Made:
-https://github.com/madepeople/Made_Cache
+* https://github.com/madepeople/Made_Cache
+* https://github.com/ctidigital/Configuration-Cache-Lock
