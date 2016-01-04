@@ -74,5 +74,5 @@ Fabrizio Balliano
 
 ## Similar solutions
 
-* https://github.com/madepeople/Made_Cache
-* https://github.com/ctidigital/Configuration-Cache-Lock
+https://github.com/madepeople/Made_Cache  
+https://github.com/ctidigital/Configuration-Cache-Lock
