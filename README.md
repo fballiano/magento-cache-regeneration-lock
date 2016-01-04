@@ -12,7 +12,7 @@ Magento, by default, doesn't use a locking mechanism to prevent multiple concurr
 
 ## Solution
 
-Overriding Mage_Core_Model_App class in your "local" codepool implementing the locking mechanism.
+Overriding Mage_Core_Model_App class in your "local" codepool implementing a locking mechanism.
 
 ## Why can't we use a standard Magento model rewrite?
 
@@ -42,7 +42,9 @@ If you're on Windows simply copy core/Mage/Core/Model/App.php to the local pool 
 To have a better compatibility across multiple Magento (1.x) versions.
 
 ##Compatibility
-Tested on Magento CE 1.9 and EE 1.13
+Tested on Magento CE 1.9 and EE 1.13.
+
+The file based flock version can only work on singe server projects or on multiserver projects where the document_root (actually the var directory) is shared via NFS. This solution will not work on a truly separated multiserver environment. I'm working on a different approach for that situation.
 
 ##Support
 If you have any issues with this extension, open an issue on GitHub (see URL above).
