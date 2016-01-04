@@ -12,7 +12,7 @@ Magento, by default, doesn't use a locking mechanism to prevent multiple concurr
 
 ## Solution
 
-Overriding Mage_Core_Model_App class in your "local" codepool implementing the locking mechanism.
+Overriding Mage_Core_Model_App class in your "local" codepool implementing a locking mechanism.
 
 ## Why can't we use a standard Magento model rewrite?
 
@@ -33,7 +33,7 @@ mkdir -p app/code/local/Mage/Core/Model
 cp app/code/core/Mage/Core/Model/App.php app/code/local/Mage/Core/Model/App.php
 wget https://raw.githubusercontent.com/fballiano/magento-cache-regeneration-lock/master/fballiano-magento-cache-regeneration-lock.patch
 patch -p1 < fballiano-magento-cache-regeneration-lock.patch
-rm fballiano-magento-cache-regeneration-lock.patch
+rm fballiano-magento-cache-regeneration-lock.patch app/code/local/Mage/Core/Model/App.php.orig
 ```
 If you're on Windows simply copy core/Mage/Core/Model/App.php to the local pool and apply the patch in this repository.
 
@@ -41,16 +41,21 @@ If you're on Windows simply copy core/Mage/Core/Model/App.php to the local pool 
 
 To have a better compatibility across multiple Magento (1.x) versions.
 
+##Compatibility
+Tested on Magento CE 1.9 and EE 1.13.
+
+The file based flock version can only work on singe server projects or on multiserver projects where the document_root (actually the var directory) is shared via NFS. This solution will not work on a truly separated multiserver environment. I'm working on a different approach for that situation.
+
 ##Support
-If you have any issues with this extension, open an issue on GitHub (see URL above).
+If you have any issues with this extension, open an issue on GitHub.
 
 ##Contribution
 Any contributions are highly appreciated. The best way to contribute code is to open a
 [pull request on GitHub](https://help.github.com/articles/using-pull-requests).
 
 ##Developer
-Fabrizio Balliano
-[http://fabrizioballiano.it](http://fabrizioballiano.com)  
+Fabrizio Balliano  
+[http://fabrizioballiano.com](http://fabrizioballiano.com)  
 [@fballiano](https://twitter.com/fballiano)
 
 ##Licence
