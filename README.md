@@ -33,7 +33,7 @@ mkdir -p app/code/local/Mage/Core/Model
 cp app/code/core/Mage/Core/Model/App.php app/code/local/Mage/Core/Model/App.php
 wget https://raw.githubusercontent.com/fballiano/magento-cache-regeneration-lock/master/fballiano-magento-cache-regeneration-lock.patch
 patch -p1 < fballiano-magento-cache-regeneration-lock.patch
-rm fballiano-magento-cache-regeneration-lock.patch
+rm fballiano-magento-cache-regeneration-lock.patch app/code/local/Mage/Core/Model/App.php.orig
 ```
 If you're on Windows simply copy core/Mage/Core/Model/App.php to the local pool and apply the patch in this repository.
 
