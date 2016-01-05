@@ -47,6 +47,8 @@ At that point in the run time it's not possible to successfully call Mage::getMo
 ##Compatibility
 Tested on Magento CE 1.9 and EE 1.13.
 
+It will not work on Magento < 1.7 cause it doesn't have Mage::getEdition() method.
+
 The file based flock version can only work on singe server projects or on multiserver projects where the document_root (actually the var directory) is shared via NFS. This solution will not work on a truly separated multiserver environment. I'm working on a different approach for that situation.
 
 ##History
