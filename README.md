@@ -45,7 +45,7 @@ To have a better compatibility across multiple Magento (1.x) versions, both CE a
 At that point in the run time it's not possible to successfully call Mage::getModel() or Mage::getResourceModel() methods, only a limited set of configurations are loaded and the Magento's class name resolution can't work.
 
 ##Compatibility
-Tested on Magento CE 1.9 and EE 1.13.
+Tested on Magento CE 1.9 and EE 1.13.1 (not working on 1.13.0).
 
 It will not work on Magento < 1.7 cause it doesn't have Mage::getEdition() method.
 
