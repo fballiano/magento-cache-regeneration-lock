@@ -41,20 +41,8 @@ If you're on Windows simply copy core/Mage/Core/Model/App.php to the local pool 
 
 To have a better compatibility across multiple Magento (1.x) versions, both CE and EE.
 
-## Why are you directly instancing the Mage_Index_Model_Resource_Helper_Mysql4 class?
-At that point in the run time it's not possible to successfully call Mage::getModel() or Mage::getResourceModel() methods, only a limited set of configurations are loaded and the Magento's class name resolution can't work.
-
 ##Compatibility
-Tested on Magento CE 1.9 and EE 1.13.1 (not working on 1.13.0).
-
-It will not work on Magento < 1.7 cause it doesn't have Mage::getEdition() method.
-
-The file based flock version can only work on singe server projects or on multiserver projects where the document_root (actually the var directory) is shared via NFS. This solution will not work on a truly separated multiserver environment. I'm working on a different approach for that situation.
-
-##History
-The first version of the patch (available at http://bit.ly/1INibTw) used file based flock and could work only on a single server environment (or on multiserver with document root shared via NFS).
-
-The newer version uses Magento's Mage_Index_Model_Resource_Helper_Mysql4 core class which locks on the database, solving the multiserver environment issue with much less custom code.
+To do the use of very basic Magento's classes/objects it should work on almost every version.
 
 ##Support
 If you have any issues with this extension, open an issue on GitHub.
