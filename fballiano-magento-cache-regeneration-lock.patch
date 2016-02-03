@@ -1,46 +1,37 @@
-From 51dd4b477b7cd11482bcd7bf5334d5825bfb05fa Mon Sep 17 00:00:00 2001
+From 0cdd8b5dfcaaca8ef2e97e9fb5f1f7cbbb4c4fb5 Mon Sep 17 00:00:00 2001
 From: Fabrizio Balliano <fabrizio@fabrizioballiano.com>
-Date: Tue, 5 Jan 2016 11:26:42 +0000
-Subject: [PATCH] added enterprise support
+Date: Wed, 3 Feb 2016 13:30:54 +0000
+Subject: [PATCH] newversion
 
 ---
- app/code/local/Mage/Core/Model/App.php | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+ app/code/local/Mage/Core/Model/App.php | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
 diff --git a/app/code/local/Mage/Core/Model/App.php b/app/code/local/Mage/Core/Model/App.php
-index 56f5765..552935d 100644
+index b340645..f755efb 100644
 --- a/app/code/local/Mage/Core/Model/App.php
 +++ b/app/code/local/Mage/Core/Model/App.php
-@@ -422,6 +422,38 @@ class Mage_Core_Model_App
+@@ -422,6 +422,29 @@ class Mage_Core_Model_App
      protected function _initModules()
      {
          if (!$this->_config->loadModulesCache()) {
 +            //FBALLIANO CACHE GENERATION LOCK START
-+            if (Mage::getEdition() == Mage::EDITION_ENTERPRISE) {
-+                $resource = new Enterprise_Index_Model_Resource_Lock_Resource();
-+                $connection = $resource->getConnection('enterprise_index_write', 'default_lock');
-+                $lock = new Enterprise_Index_Model_Resource_Helper_Mysql4("enterprise_index");
-+            } else {
-+                $resource = new Mage_Index_Model_Resource_Lock_Resource();
-+                $connection = $resource->getConnection('index_write', 'default_lock');
-+                $lock = new Mage_Index_Model_Resource_Helper_Mysql4("index");
-+            }
-+            $lock->setWriteAdapter($connection);
-+            $loopcounter = 0;
-+            while (true) {
++            $lock = Mage::getSingleton("core/resource")->getConnection("core_write");
++            for ($loopcounter=0; $loopcounter<11; $loopcounter++) {
 +                //try to get the lock. failure means someone else holds the lock
-+                if ($lock->setLock("fballiano_cache_regeneration")) {
++                if ($lock->fetchOne("SELECT GET_LOCK('fballiano_cache_regeneration', 5)")) {
 +                    //perhaps someone else was building cache content while we waited for the lock
 +                    //lets see if we can load anything
 +                    if ($this->_config->loadModulesCache()) {
-+                        $lock->releaseLock("fballiano_cache_regeneration");
++                        $lock->query("SELECT RELEASE_LOCK('fballiano_cache_regeneration')");
 +                        return $this;
 +                    }
 +
 +                    //cache was empty or corrupt. proceed to building the cache content
 +                    break;
 +                }
-+                if ($loopcounter++ > 20) {
++
++                if ($loopcounter > 9) {
 +                    header("504 Gateway Timeout", true, 504);
 +                    die();
 +                }
@@ -50,13 +41,13 @@ index 56f5765..552935d 100644
              $this->_config->loadModules();
              if ($this->_config->isLocalConfigLoaded() && !$this->_shouldSkipProcessModulesUpdates()) {
                  Varien_Profiler::start('mage::app::init::apply_db_schema_updates');
-@@ -430,6 +462,10 @@ class Mage_Core_Model_App
+@@ -430,6 +453,10 @@ class Mage_Core_Model_App
              }
              $this->_config->loadDb();
              $this->_config->saveCache();
 +
 +            //FBALLIANO CACHE GENERATION LOCK START
-+            $lock->releaseLock("fballiano_cache_regeneration");
++            $lock->query("SELECT RELEASE_LOCK('fballiano_cache_regeneration')");
 +            //FBALLIANO CACHE GENERATION LOCK END
          }
          return $this;
