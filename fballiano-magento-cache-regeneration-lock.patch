@@ -11,7 +11,7 @@ diff --git a/app/code/local/Mage/Core/Model/App.php b/app/code/local/Mage/Core/M
 index 56f5765..552935d 100644
 --- a/app/code/local/Mage/Core/Model/App.php
 +++ b/app/code/local/Mage/Core/Model/App.php
-@@ -422,6 +422,43 @@ class Mage_Core_Model_App
+@@ -422,6 +422,38 @@ class Mage_Core_Model_App
      protected function _initModules()
      {
          if (!$this->_config->loadModulesCache()) {
@@ -30,13 +30,8 @@ index 56f5765..552935d 100644
 +            while (true) {
 +                //try to get the lock. failure means someone else holds the lock
 +                if ($lock->setLock("fballiano_cache_regeneration")) {
-+                    if ($loopcounter == 0) {
-+                        //we got the lock on first try. proceed to building the cache content
-+                        break;
-+                    }
-+
-+                    //we didnt get the lock on first try, so someone else was building the cache content
-+                    //lets try to use that
++                    //perhaps someone else was building cache content while we waited for the lock
++                    //lets see if we can load anything
 +                    if ($this->_config->loadModulesCache()) {
 +                        $lock->releaseLock("fballiano_cache_regeneration");
 +                        return $this;
@@ -55,7 +50,7 @@ index 56f5765..552935d 100644
              $this->_config->loadModules();
              if ($this->_config->isLocalConfigLoaded() && !$this->_shouldSkipProcessModulesUpdates()) {
                  Varien_Profiler::start('mage::app::init::apply_db_schema_updates');
-@@ -430,6 +467,10 @@ class Mage_Core_Model_App
+@@ -430,6 +462,10 @@ class Mage_Core_Model_App
              }
              $this->_config->loadDb();
              $this->_config->saveCache();
