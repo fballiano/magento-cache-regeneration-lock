@@ -11,7 +11,7 @@ diff --git a/app/code/local/Mage/Core/Model/App.php b/app/code/local/Mage/Core/M
 index 56f5765..552935d 100644
 --- a/app/code/local/Mage/Core/Model/App.php
 +++ b/app/code/local/Mage/Core/Model/App.php
-@@ -422,6 +422,32 @@ class Mage_Core_Model_App
+@@ -422,6 +422,38 @@ class Mage_Core_Model_App
      protected function _initModules()
      {
          if (!$this->_config->loadModulesCache()) {
@@ -26,25 +26,31 @@ index 56f5765..552935d 100644
 +                $lock = new Mage_Index_Model_Resource_Helper_Mysql4("index");
 +            }
 +            $lock->setWriteAdapter($connection);
-+            if ($lock->isLocked("fballiano_cache_regeneration")) {
-+                $loopcounter = 0;
-+                do {
-+                    if ($loopcounter++ > 20) {
-+                        header("504 Gateway Timeout", true, 504);
-+                        die();
++            $loopcounter = 0;
++            while (true) {
++                //try to get the lock. failure means someone else holds the lock
++                if ($lock->setLock("fballiano_cache_regeneration")) {
++                    //perhaps someone else was building cache content while we waited for the lock
++                    //lets see if we can load anything
++                    if ($this->_config->loadModulesCache()) {
++                        $lock->releaseLock("fballiano_cache_regeneration");
++                        return $this;
 +                    }
-+                    sleep(3);
-+                } while ($lock->isLocked("fballiano_cache_regeneration"));
-+                $this->_config->loadModulesCache();
-+                return $this;
++
++                    //cache was empty or corrupt. proceed to building the cache content
++                    break;
++                }
++                if ($loopcounter++ > 20) {
++                    header("504 Gateway Timeout", true, 504);
++                    die();
++                }
 +            }
-+            $lock->setLock("fballiano_cache_regeneration");
 +            //FBALLIANO CACHE GENERATION LOCK END
 +
              $this->_config->loadModules();
              if ($this->_config->isLocalConfigLoaded() && !$this->_shouldSkipProcessModulesUpdates()) {
                  Varien_Profiler::start('mage::app::init::apply_db_schema_updates');
-@@ -430,6 +456,10 @@ class Mage_Core_Model_App
+@@ -430,6 +462,10 @@ class Mage_Core_Model_App
              }
              $this->_config->loadDb();
              $this->_config->saveCache();
