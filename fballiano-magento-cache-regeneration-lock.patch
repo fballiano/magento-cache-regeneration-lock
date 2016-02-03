@@ -1,47 +1,38 @@
-From 0cdd8b5dfcaaca8ef2e97e9fb5f1f7cbbb4c4fb5 Mon Sep 17 00:00:00 2001
+From e42ade3f5264c5b0c2c60499ec9c36d33f1f8159 Mon Sep 17 00:00:00 2001
 From: Fabrizio Balliano <fabrizio@fabrizioballiano.com>
-Date: Wed, 3 Feb 2016 13:30:54 +0000
-Subject: [PATCH] newversion
+Date: Wed, 3 Feb 2016 13:50:30 +0000
+Subject: [PATCH] nocycle
 
 ---
- app/code/local/Mage/Core/Model/App.php | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+ app/code/local/Mage/Core/Model/App.php | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
 diff --git a/app/code/local/Mage/Core/Model/App.php b/app/code/local/Mage/Core/Model/App.php
-index b340645..f755efb 100644
+index b340645..ec1b115 100644
 --- a/app/code/local/Mage/Core/Model/App.php
 +++ b/app/code/local/Mage/Core/Model/App.php
-@@ -422,6 +422,29 @@ class Mage_Core_Model_App
+@@ -422,6 +422,20 @@ class Mage_Core_Model_App
      protected function _initModules()
      {
          if (!$this->_config->loadModulesCache()) {
 +            //FBALLIANO CACHE GENERATION LOCK START
 +            $lock = Mage::getSingleton("core/resource")->getConnection("core_write");
-+            for ($loopcounter=0; $loopcounter<11; $loopcounter++) {
-+                //try to get the lock. failure means someone else holds the lock
-+                if ($lock->fetchOne("SELECT GET_LOCK('fballiano_cache_regeneration', 5)")) {
-+                    //perhaps someone else was building cache content while we waited for the lock
-+                    //lets see if we can load anything
-+                    if ($this->_config->loadModulesCache()) {
-+                        $lock->query("SELECT RELEASE_LOCK('fballiano_cache_regeneration')");
-+                        return $this;
-+                    }
-+
-+                    //cache was empty or corrupt. proceed to building the cache content
-+                    break;
++            if ($lock->fetchOne("SELECT GET_LOCK('fballiano_cache_regeneration', 60)")) {
++                //check if someone built the cache while we waited for the lock
++                if ($this->_config->loadModulesCache()) {
++                    $lock->query("SELECT RELEASE_LOCK('fballiano_cache_regeneration')");
++                    return $this;
 +                }
-+
-+                if ($loopcounter > 9) {
-+                    header("504 Gateway Timeout", true, 504);
-+                    die();
-+                }
++            } else {
++                header("504 Gateway Timeout", true, 504);
++                die();
 +            }
 +            //FBALLIANO CACHE GENERATION LOCK END
 +
              $this->_config->loadModules();
              if ($this->_config->isLocalConfigLoaded() && !$this->_shouldSkipProcessModulesUpdates()) {
                  Varien_Profiler::start('mage::app::init::apply_db_schema_updates');
-@@ -430,6 +453,10 @@ class Mage_Core_Model_App
+@@ -430,6 +444,10 @@ class Mage_Core_Model_App
              }
              $this->_config->loadDb();
              $this->_config->saveCache();
