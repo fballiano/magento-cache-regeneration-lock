@@ -9,8 +9,8 @@ Subject: [PATCH] nocycle
 
 diff --git a/app/code/local/Mage/Core/Model/App.php b/app/code/local/Mage/Core/Model/App.php
 index b340645..ec1b115 100644
---- a/app/code/local/Mage/Core/Model/App.php
-+++ b/app/code/local/Mage/Core/Model/App.php
+--- a/app/code/core/Mage/Core/Model/App.php
++++ b/app/code/core/Mage/Core/Model/App.php
 @@ -422,6 +422,20 @@ class Mage_Core_Model_App
      protected function _initModules()
      {
