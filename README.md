@@ -41,25 +41,25 @@ If you're on Windows simply copy core/Mage/Core/Model/App.php to the local pool 
 
 To have a better compatibility across multiple Magento (1.x) versions, both CE and EE.
 
-##Compatibility
+## Compatibility
 To do the use of very basic Magento's classes/objects it should work on almost every version.
 
-##Support
+## Support
 If you have any issues with this extension, open an issue on GitHub.
 
-##Contribution
+## Contribution
 Any contributions are highly appreciated. The best way to contribute code is to open a
 [pull request on GitHub](https://help.github.com/articles/using-pull-requests).
 
-##Developer
+## Developer
 Fabrizio Balliano  
 [http://fabrizioballiano.com](http://fabrizioballiano.com)  
 [@fballiano](https://twitter.com/fballiano)
 
-##Licence
+## Licence
 [OSL - Open Software Licence 3.0](http://opensource.org/licenses/osl-3.0.php)
 
-##Copyright
+## Copyright
 (c) Fabrizio Balliano
 
 ## Similar solutions
