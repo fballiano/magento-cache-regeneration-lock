@@ -8,7 +8,9 @@ Avoid DOS when Magento regenerates its cache.
 <a href="https://www.paypal.com/paypalme/fabrizioballiano" target=_blank title="Donate via PayPal"><img src="https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white" alt="Donate via PayPal" /></a>
 </td></tr></table>
 
-**Important: this patch is not needed starting from OpenMage 20.3.0 because it's beeing merged in the core.**
+## Important
+
+**This patch is not needed starting from OpenMage 20.3.0 because it's beeing merged in the core.**
 
 ## The problem
 Let's say you reset Magento's cache, on the next run the cache gets recreated but... what if you're website has a lot of traffic and, before the cache regeneration finishes, you got more requests?
